@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"golangredis/domain/model"
 	"golangredis/domain/repository"
 	"time"
@@ -44,7 +45,7 @@ func (u *redisUsecase) SetUsecase(ctx context.Context, req model.RedisReq) *mode
 	if err != nil {
 		log.Error(usecaseName+" SetValue error: ", err)
 
-		return new(model.BaseResponse).Response(err, nil)
+		return new(model.BaseResponse).Response(errors.New("Failed set redis"), nil)
 	}
 
 	return new(model.BaseResponse).Response(nil, "Success")
