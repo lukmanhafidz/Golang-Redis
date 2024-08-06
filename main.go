@@ -2,6 +2,9 @@ package main
 
 import (
 	"golangredis/domain/model"
+	"golangredis/infrastructure/persistence"
+	"golangredis/interfaces"
+	"golangredis/usecase"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,16 +19,31 @@ func main() {
 
 	cfg := model.RedisConfig{}
 
+	//load config
 	err := configor.Load(&cfg, "config.yml")
 	if err != nil {
 		log.Println("error config ", err)
 		return
 	}
 
+	//get repositories
+	newRepo, err := persistence.NewRepositories()
+	if err != nil {
+		log.Println("redis init error", err)
+	}
+
+	//new usecase
+	redisUsecase := usecase.NewRedisUsecase(newRepo.RedisRepo)
+
+	//new handler
+	redisHandler := interfaces.NewRedisHandler(redisUsecase)
+
+	//config fiber
 	fiberCfg := fiber.Config{
 		BodyLimit: 5 * 1024 * 1024,
 	}
 
+	//new fiber instance
 	app := fiber.New(fiberCfg)
 
 	app.Use(logger.New())
@@ -39,6 +57,8 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           86400,
 	}))
+
+	app.Post("redis/set", redisHandler.SetHandler)
 
 	app.Listen(":" + cfg.Port)
 }
