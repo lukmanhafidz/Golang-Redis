@@ -29,7 +29,7 @@ func main() {
 	//get repositories
 	newRepo, err := persistence.NewRepositories()
 	if err != nil {
-		log.Println("redis init error", err)
+		log.Fatal("redis init error", err)
 	}
 
 	//new usecase
@@ -59,6 +59,7 @@ func main() {
 	}))
 
 	app.Post("redis/set", redisHandler.SetHandler)
+	app.Post("redis/get", redisHandler.GetHandler)
 
 	app.Listen(":" + cfg.Port)
 }

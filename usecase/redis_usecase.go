@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"golangredis/domain/model"
 	"golangredis/domain/repository"
 	"time"
@@ -15,6 +16,7 @@ type redisUsecase struct {
 
 type IRedisUsecase interface {
 	SetUsecase(ctx context.Context, req model.RedisReq) *model.BaseResponse
+	GetUsecase(ctx context.Context, key string) *model.BaseResponse
 }
 
 func NewRedisUsecase(redisRepo repository.IRedisRepository) IRedisUsecase {
@@ -44,8 +46,25 @@ func (u *redisUsecase) SetUsecase(ctx context.Context, req model.RedisReq) *mode
 	if err != nil {
 		log.Error(usecaseName+" SetValue error: ", err)
 
-		return new(model.BaseResponse).Response(err, nil)
+		return new(model.BaseResponse).Response(errors.New("Failed set redis"), nil)
 	}
 
 	return new(model.BaseResponse).Response(nil, "Success")
+}
+
+func (u redisUsecase) GetUsecase(ctx context.Context, key string) *model.BaseResponse {
+	usecaseName := "[GetUsecase]"
+
+	valueRedis, err := u.redisRepo.GetValue(ctx, key)
+	if err != nil {
+		log.Error(usecaseName+" GetValue error: ", err)
+
+		return new(model.BaseResponse).Response(errors.New("Failed get redis"), nil)
+	}
+
+	if valueRedis == "" {
+		return new(model.BaseResponse).Response(errors.New("value not found"), nil)
+	}
+
+	return new(model.BaseResponse).Response(nil, valueRedis)
 }
