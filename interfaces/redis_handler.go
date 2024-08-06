@@ -39,3 +39,22 @@ func (h *redisHandler) SetHandler(ctx *fiber.Ctx) error {
 
 	return model.Response(ctx, http.StatusOK, h.redisUc.SetUsecase(ctx.Context(), req))
 }
+
+func (h *redisHandler) GetHandler(ctx *fiber.Ctx) error {
+	handlerName := "[GetHandler]"
+
+	req := model.RedisReq{}
+	if err := ctx.BodyParser(&req); err != nil {
+		log.Error(handlerName+" BodyParser error: ", err)
+
+		return model.Response(ctx, http.StatusBadRequest, err)
+	}
+
+	if err := middlewares.ValidateRequest(req); err != nil {
+		log.Error(handlerName+" ValidateRequest error: ", err)
+
+		return model.Response(ctx, http.StatusBadRequest, err)
+	}
+
+	return model.Response(ctx, http.StatusOK, h.redisUc.GetUsecase(ctx.Context(), req.Key))
+}
