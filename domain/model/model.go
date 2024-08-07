@@ -10,12 +10,12 @@ type RedisConfig struct {
 }
 
 type BaseResponse struct {
-	Error error       `json:"error"`
-	Data  interface{} `json:"data"`
+	ErrorMsg string      `json:"error"`
+	Data     interface{} `json:"data"`
 }
 
 func (br *BaseResponse) Response(err error, data interface{}) *BaseResponse {
-	return &BaseResponse{Error: err, Data: data}
+	return &BaseResponse{ErrorMsg: err.Error(), Data: data}
 }
 
 func Response(ctx *fiber.Ctx, statusHttp int, data interface{}) error {

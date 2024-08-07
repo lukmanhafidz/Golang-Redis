@@ -31,3 +31,7 @@ func (r *redisRepository) GetValue(ctx context.Context, key string) (string, err
 
 	return redisValue, nil
 }
+
+func (r *redisRepository) DeleteValue(ctx context.Context, key string) error {
+	return r.redisClient.Del(ctx, key).Err()
+}

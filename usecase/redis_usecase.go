@@ -17,6 +17,7 @@ type redisUsecase struct {
 type IRedisUsecase interface {
 	SetUsecase(ctx context.Context, req model.RedisReq) *model.BaseResponse
 	GetUsecase(ctx context.Context, key string) *model.BaseResponse
+	DeleteUsecase(ctx context.Context, key string) *model.BaseResponse
 }
 
 func NewRedisUsecase(redisRepo repository.IRedisRepository) IRedisUsecase {
@@ -52,7 +53,7 @@ func (u *redisUsecase) SetUsecase(ctx context.Context, req model.RedisReq) *mode
 	return new(model.BaseResponse).Response(nil, "Success")
 }
 
-func (u redisUsecase) GetUsecase(ctx context.Context, key string) *model.BaseResponse {
+func (u *redisUsecase) GetUsecase(ctx context.Context, key string) *model.BaseResponse {
 	usecaseName := "[GetUsecase]"
 
 	valueRedis, err := u.redisRepo.GetValue(ctx, key)
@@ -67,4 +68,17 @@ func (u redisUsecase) GetUsecase(ctx context.Context, key string) *model.BaseRes
 	}
 
 	return new(model.BaseResponse).Response(nil, valueRedis)
+}
+
+func (u *redisUsecase) DeleteUsecase(ctx context.Context, key string) *model.BaseResponse {
+	usecaseName := "[DeleteUsecase]"
+
+	err := u.redisRepo.DeleteValue(ctx, key)
+	if err != nil {
+		log.Error(usecaseName+" DeleteValue error: ", err)
+
+		return new(model.BaseResponse).Response(errors.New("Failed delete redis"), nil)
+	}
+
+	return new(model.BaseResponse).Response(nil, "Success")
 }

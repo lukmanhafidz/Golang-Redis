@@ -58,3 +58,22 @@ func (h *redisHandler) GetHandler(ctx *fiber.Ctx) error {
 
 	return model.Response(ctx, http.StatusOK, h.redisUc.GetUsecase(ctx.Context(), req.Key))
 }
+
+func (h *redisHandler) DeleteHandler(ctx *fiber.Ctx) error {
+	handlerName := "[DeleteHandler]"
+
+	req := model.RedisReq{}
+	if err := ctx.BodyParser(&req); err != nil {
+		log.Error(handlerName+" BodyParser error: ", err)
+
+		return model.Response(ctx, http.StatusBadRequest, err)
+	}
+
+	if err := middlewares.ValidateRequest(req); err != nil {
+		log.Error(handlerName+" ValidateRequest error: ", err)
+
+		return model.Response(ctx, http.StatusBadRequest, err)
+	}
+
+	return model.Response(ctx, http.StatusOK, h.redisUc.DeleteUsecase(ctx.Context(), req.Key))
+}
