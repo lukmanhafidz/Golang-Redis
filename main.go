@@ -60,6 +60,7 @@ func main() {
 
 	app.Post("redis/set", redisHandler.SetHandler)
 	app.Post("redis/get", redisHandler.GetHandler)
+	app.Post("redis/delete", redisHandler.DeleteHandler)
 
 	app.Listen(":" + cfg.Port)
 }
