@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile) //set up logger
 
 	cfg := model.RedisConfig{}
 
